@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Bautizo | Annette Copca Arellano</title>
+
+  <!-- Google Fonts: Cormorant Garamond & Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-cream: #FAF8F5;
+      --gold-primary: #C5A059;
+      --gold-light: #E8D8B0;
+      --gold-dark: #9A7B38;
+      --text-main: #2C2A29;
+      --text-muted: #6E6864;
+      --gold-glow: rgba(197, 160, 89, 0.28);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background-image: radial-gradient(rgba(197, 160, 89, 0.08) 1px, transparent 1px);
+      background-size: 26px 26px;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    /* Floating hearts / particles canvas */
+    #hearts-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Envelope Cover Screen */
+    #envelope-screen {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at center, #FFFFFF 0%, #F5EFE6 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+      cursor: pointer;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+      user-select: none;
+      padding: 20px;
+    }
+
+    #envelope-screen.opened {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    .envelope-card {
+      background: #FFFFFF;
+      padding: 38px 28px;
+      border-radius: 28px;
+      box-shadow: 0 20px 48px rgba(154, 123, 56, 0.16), 0 4px 14px rgba(0, 0, 0, 0.03);
+      border: 1px solid rgba(232, 216, 176, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 330px;
+      width: 100%;
+      text-align: center;
+      position: relative;
+    }
+
+    .envelope-tag {
+      font-size: 0.72rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+
+    .envelope-names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.3rem;
+      font-weight: 400;
+      color: #222222;
+      margin: 4px 0 10px;
+      line-height: 1.1;
+    }
+
+    .wax-seal {
+      width: 124px;
+      height: 124px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #E5C158 0%, #BA8B26 65%, #7D560B 100%);
+      box-shadow: 0 12px 32px rgba(186, 139, 38, 0.42);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid rgba(255, 255, 255, 0.65);
+      animation: pulseSeal 2.6s infinite ease-in-out;
+      margin: 12px 0 16px;
+      cursor: pointer;
+    }
+
+    @keyframes pulseSeal {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 12px 30px rgba(186, 139, 38, 0.38);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 18px 42px rgba(186, 139, 38, 0.6);
+      }
+    }
+
+    .seal-cross {
+      width: 34px;
+      height: 38px;
+      fill: none;
+      stroke: #FFF5D6;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+    }
+
+    .seal-text {
+      color: #FFF5D6;
+      font-size: 0.72rem;
+      letter-spacing: 3px;
+      margin-top: 5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .tap-hint {
+      font-size: 0.8rem;
+      letter-spacing: 3px;
+      color: var(--gold-dark);
+      text-transform: uppercase;
+      font-weight: 500;
+      margin-top: 6px;
+    }
+
+    .open-btn-fallback {
+      margin-top: 14px;
+      background: var(--gold-primary);
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 20px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
+    }
+
+    /* Floating Music Bar */
+    .music-bar {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 998;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid var(--gold-light);
+      padding: 9px 16px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(154, 123, 56, 0.16);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      user-select: none;
+    }
+
+    .music-bar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(197, 160, 89, 0.32);
+    }
+
+    .music-waves {
+      display: flex;
+      align-items: center;
+      gap: 2.5px;
+      height: 14px;
+    }
+
+    .music-waves span {
+      width: 2px;
+      height: 100%;
+      background: var(--gold-primary);
+      border-radius: 2px;
+      animation: wave 1.2s infinite ease-in-out;
+    }
+
+    .music-waves span:nth-child(2) { animation-delay: 0.2s; }
+    .music-waves span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes wave {
+      0%, 100% { height: 4px; }
+      50% { height: 14px; }
+    }
+
+    .music-waves.paused span {
+      animation: none;
+      height: 4px;
+    }
+
+    .music-title {
+      font-size: 0.72rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 500;
+    }
+
+    /* Main Container */
+    .invitation-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 70px 24px 110px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header-symbol svg {
+      width: 50px;
+      height: 50px;
+      fill: none;
+      stroke: var(--gold-primary);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin-bottom: 16px;
+    }
+
+    .names {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3.4rem;
+      font-weight: 300;
+      letter-spacing: 3px;
+      color: #222222;
+      line-height: 1.15;
+      margin-bottom: 18px;
+    }
+
+    .names span {
+      display: block;
+      font-size: 2.1rem;
+      letter-spacing: 4px;
+      color: var(--gold-dark);
+      font-weight: 400;
+      margin-top: 4px;
+    }
+
+    .invitation-quote {
+      font-size: 0.9rem;
+      letter-spacing: 2.2px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-bottom: 26px;
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    .bible-verse {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-style: italic;
+      color: var(--gold-dark);
+      max-width: 530px;
+      margin: 0 auto 32px;
+      line-height: 1.7;
+    }
+
+    .bible-citation {
+      display: block;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.74rem;
+      font-style: normal;
+      letter-spacing: 3px;
+      color: var(--gold-primary);
+      margin-top: 10px;
+      text-transform: uppercase;
+    }
+
+    .separator {
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+      margin: 38px auto;
+    }
+
+    .section-icon {
+      width: 34px;
+      height: 34px;
+      fill: none;
+      stroke: var(--gold-primary);
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin: 0 auto 12px;
+      display: block;
+    }
+
+    /* Date row */
+    .date-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin: 20px 0 8px;
+      flex-wrap: wrap;
+    }
+
+    .date-side {
+      font-size: 1.05rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold-dark);
+      font-weight: 400;
+    }
+
+    .date-separator-bar {
+      font-size: 1.8rem;
+      color: var(--gold-light);
+      font-weight: 300;
+      user-select: none;
+    }
+
+    .date-center-big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 4.4rem;
+      font-weight: 600;
+      color: #222222;
+      line-height: 1;
+      padding: 0 4px;
+    }
+
+    .date-time {
+      font-size: 0.88rem;
+      letter-spacing: 3px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.1rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      color: #222222;
+      margin-bottom: 12px;
+    }
+
+    .place-name {
+      font-size: 1.18rem;
+      font-weight: 500;
+      color: var(--gold-dark);
+      margin-top: 10px;
+    }
+
+    .place-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 5px;
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .btn-gold {
+      display: inline-block;
+      padding: 11px 26px;
+      border: 1px solid var(--gold-primary);
+      color: var(--gold-dark);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-radius: 30px;
+      transition: all 0.3s ease;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .btn-gold:hover {
+      background: var(--gold-primary);
+      color: #FFFFFF;
+      box-shadow: 0 6px 18px rgba(197, 160, 89, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .rsvp-form {
+      max-width: 440px;
+      margin: 22px auto 0;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .rsvp-input {
+      width: 100%;
+      padding: 13px 18px;
+      border: 1px solid rgba(197, 160, 89, 0.45);
+      background: #FFFFFF;
+      border-radius: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 0.9rem;
+      color: #333333;
+      outline: none;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    .rsvp-input:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CANVAS DE CORAZONES FLOTANTES -->
+  <canvas id="hearts-canvas"></canvas>
+
+  <!-- PANTALLA INICIAL: SOBRE CON SELLO DE CERA -->
+  <div id="envelope-screen">
+    <div class="envelope-card">
+      <div class="envelope-tag">Mi Bautizo</div>
+      <h2 class="envelope-names">Annette<br><span style="font-size:1.5rem; color:var(--gold-dark);">Copca Arellano</span></h2>
+
+      <div class="wax-seal" id="waxSealBtn">
+        <!-- Cruz de Bautizo -->
+        <svg class="seal-cross" viewBox="0 0 24 24">
+          <line x1="12" y1="3" x2="12" y2="21" stroke-width="2.5" />
+          <line x1="6" y1="8" x2="18" y2="8" stroke-width="2.5" />
+          <circle cx="12" cy="8" r="1.5" fill="#FFF5D6" />
+        </svg>
+        <span class="seal-text">A C A</span>
+      </div>
+
+      <p class="tap-hint">Toca el sello para abrir la invitación</p>
+      <button type="button" class="open-btn-fallback" id="openBtnFallback">Abrir Invitación</button>
+    </div>
+  </div>
+
+  <!-- CONTROL FLOTANTE DE MÚSICA -->
+  <div class="music-bar" id="musicBtn" onclick="toggleMusic()">
+    <div class="music-waves" id="musicWaves">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <span class="music-title" id="musicTitleText">♫ Canción de Cuna - Brahms</span>
+  </div>
+
+  <!-- CONTENEDOR PRINCIPAL CONTINUO -->
+  <div class="invitation-container">
+
+    <!-- SÍMBOLO SACRAMENTAL (Paloma / Espíritu Santo) -->
+    <div class="header-symbol">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2a4 4 0 0 0-4 4c0 1.8 1.2 3.3 2.8 3.8L12 22l1.2-12.2C14.8 9.3 16 7.8 16 6a4 4 0 0 0-4-4z"/>
+        <path d="M4 10c3 0 6 2 8 5"/>
+        <path d="M20 10c-3 0-6 2-8 5"/>
+      </svg>
+    </div>
+
+    <div class="invitation-quote" style="letter-spacing: 4px; margin-bottom: 8px;">Acompáñanos al Sacramento del Bautizo de</div>
+    <h1 class="names">Annette <span>Copca Arellano</span></h1>
+
+    <!-- CITA BÍBLICA DE BAUTIZO -->
+    <div class="bible-verse">
+      «Dejen que los niños vengan a mí, y no se lo impidan, porque el reino de Dios es de quienes son como ellos.»
+      <span class="bible-citation">Lucas 18:16</span>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- FECHA HORIZONTAL -->
+    <div>
+      <svg class="section-icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <div class="date-row">
+        <span class="date-side">Sábado</span>
+        <span class="date-separator-bar">|</span>
+        <span class="date-center-big">21</span>
+        <span class="date-separator-bar">|</span>
+        <span class="date-side">Noviembre 2026</span>
+      </div>
+      <div class="date-time">Corregidora, Querétaro</div>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- UBICACIONES -->
+    <h2 class="section-title">Nuestra Celebración</h2>
+
+    <!-- MISA / CEREMONIA BAUTISMAL -->
+    <div class="place-item">
+      <!-- Icono de Iglesia -->
+      <svg class="section-icon" viewBox="0 0 24 24"><path d="M12 2L2 7v15h20V7L12 2z"/><path d="M12 11v6"/><path d="M9 14h6"/><path d="M12 5v2"/></svg>
+      <h3 class="place-name">Misa de Bautizo</h3>
+      <p class="place-desc">1:00 PM • Parroquia Del Espiritu Santo<br>Toca el botón para ver la dirección exacta en el mapa</p>
+      <a href="https://maps.app.goo.gl/xNdBGVRj2Br9iE2S6" target="_blank" rel="noopener noreferrer" class="btn-gold">Abrir en Google Maps</a>
+    </div>
+
+    <!-- RECEPCIÓN -->
+    <div style="margin-top: 40px;">
+      <!-- Icono de Festejo / Copas -->
+      <svg class="section-icon" viewBox="0 0 24 24"><path d="M8 21h8m-4-4v4M6 3l6 9 6-9H6z"/></svg>
+      <h3 class="place-name">Recepción Familiar</h3>
+      <p class="place-desc">6:30 PM • La Cabaña del Río<br>Del Río #4, El Pueblito, Corregidora, Qro.</p>
+      <a href="https://maps.google.com/?cid=13739350067362681849" target="_blank" rel="noopener noreferrer" class="btn-gold">Abrir en Google Maps</a>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- HOSPEDAJE SUGERIDO -->
+    <svg class="section-icon" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M13 9h6v12"/></svg>
+    <h2 class="section-title">Hospedaje Sugerido</h2>
+    <p class="place-desc">Para la comodidad de nuestros familiares y amigos foráneos:</p>
+    <h3 class="place-name">Hotel Plaza Camelinas</h3>
+    <p class="place-desc">Av. 5 de Febrero #28, La Capilla (cerca de Plaza de Toros Santa María), Santiago de Querétaro.</p>
+    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+      <a href="https://maps.google.com/?cid=10189528852425998511" target="_blank" rel="noopener noreferrer" class="btn-gold">Ver Ubicación</a>
+      <a href="tel:+524421923900" class="btn-gold">Llamar a Recepción</a>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- MESA DE REGALOS -->
+    <svg class="section-icon" viewBox="0 0 24 24"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
+    <h2 class="section-title">Mesa de Regalos</h2>
+    <p class="place-desc">Su compañía y cariño para Annette son nuestro mayor regalo. Si desean obsequiarle un detalle especial, pueden consultar la mesa de regalos:</p>
+    <div style="margin-top: 15px;">
+      <a href="https://mesaderegalos.liverpool.com.mx/milistaderegalos/60055275" target="_blank" rel="noopener noreferrer" class="btn-gold">Mesa de Regalos Liverpool</a>
+    </div>
+
+    <div class="separator"></div>
+
+    <!-- RSVP A WHATSAPP -->
+    <svg class="section-icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <h2 class="section-title">Confirmación de Asistencia</h2>
+    <p class="place-desc">Favor de confirmar su asistencia antes del 17 de octubre de 2026:</p>
+
+    <form class="rsvp-form" onsubmit="sendRSVP(event)">
+      <input type="text" id="guestName" class="rsvp-input" placeholder="Nombre de la familia o invitado" required>
+      <input type="number" id="guestPasses" class="rsvp-input" placeholder="Número de personas" min="1" max="6" value="1" required>
+      <input type="text" id="guestNote" class="rsvp-input" placeholder="Mensaje para Annette y la familia (opcional)">
+      <button type="submit" class="btn-gold" style="padding: 14px; font-weight: 500; background: var(--gold-primary); color: #FFFFFF;">Confirmar por WhatsApp</button>
+    </form>
+
+  </div>
+
+  <script>
+    /* =========================================================
+       1. APERTURA DE SOBRE DESVINCULADA DE FALLOS DE AUDIO
+       ========================================================= */
+    let hasOpened = false;
+
+    function openEnvelope() {
+      if (hasOpened) return;
+      hasOpened = true;
+
+      const screen = document.getElementById('envelope-screen');
+      if (screen) {
+        screen.classList.add('opened');
+      }
+
+      try {
+        initAudioAndPlay();
+      } catch (err) {
+        console.warn('Audio no permitido inmediatamente:', err);
+      }
+    }
+
+    const envelopeScreen = document.getElementById('envelope-screen');
+    const waxSeal = document.getElementById('waxSealBtn');
+    const fallbackBtn = document.getElementById('openBtnFallback');
+
+    [envelopeScreen, waxSeal, fallbackBtn].forEach(element => {
+      if (element) {
+        element.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openEnvelope();
+        });
+      }
+    });
+
+    /* =========================================================
+       2. CORAZONES FLOTANTES Y DESTELLOS
+       ========================================================= */
+    const canvas = document.getElementById('hearts-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    function drawHeart(c, x, y, size, opacity) {
+      c.save();
+      c.translate(x, y);
+      c.beginPath();
+      const topCurveHeight = size * 0.3;
+      c.moveTo(0, topCurveHeight);
+      c.bezierCurveTo(0, 0, -size / 2, 0, -size / 2, topCurveHeight);
+      c.bezierCurveTo(-size / 2, (size + topCurveHeight) / 2, 0, size, 0, size);
+      c.bezierCurveTo(0, size, size / 2, (size + topCurveHeight) / 2, size / 2, topCurveHeight);
+      c.bezierCurveTo(size / 2, 0, 0, 0, 0, topCurveHeight);
+      c.closePath();
+      c.fillStyle = `rgba(197, 160, 89, ${opacity * 0.6})`;
+      c.shadowColor = 'rgba(212, 175, 55, 0.35)';
+      c.shadowBlur = 5;
+      c.fill();
+      c.restore();
+    }
+
+    class FloatingHeart {
+      constructor(initial = false) {
+        this.reset(initial);
+      }
+      reset(initial = false) {
+        this.x = Math.random() * width;
+        this.y = initial ? Math.random() * height : height + 25;
+        this.size = Math.random() * 11 + 7;
+        this.speedY = Math.random() * 0.6 + 0.3;
+        this.opacity = Math.random() * 0.4 + 0.15;
+        this.sway = Math.random() * Math.PI * 2;
+        this.swaySpeed = Math.random() * 0.02 + 0.01;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.sway += this.swaySpeed;
+        this.x += Math.sin(this.sway) * 0.45;
+        if (this.y < -35) {
+          this.reset(false);
+        }
+      }
+      draw() {
+        drawHeart(ctx, this.x, this.y, this.size, this.opacity);
+      }
+    }
+
+    const particles = [];
+    const PARTICLE_COUNT = 22;
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      particles.push(new FloatingHeart(true));
+    }
+
+    function animateHearts() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animateHearts);
+    }
+    animateHearts();
+
+    /* =========================================================
+       3. CAJA DE MÚSICA DE BEBÉ: BRAHMS LULLABY
+       ========================================================= */
+    let audioCtx = null;
+    let isPlaying = false;
+    let melodyTimer = null;
+
+    const N = {
+      C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.00, A4: 440.00, B4: 493.88,
+      C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, A5: 880.00,
+      C6: 1046.50, D6: 1174.66, E6: 1318.51, G6: 1567.98
+    };
+
+    // Melodía tierna de Canción de Cuna (Brahms)
+    const lullaby = [
+      { m: N.E5, b: N.C4, d: 0.5 },
+      { m: N.E5, b: null, d: 0.5 },
+      { m: N.G5, b: N.G4, d: 1.0 },
+
+      { m: N.E5, b: N.C4, d: 0.5 },
+      { m: N.E5, b: null, d: 0.5 },
+      { m: N.G5, b: N.G4, d: 1.1 },
+
+      { m: N.E5, b: N.C4, d: 0.45 },
+      { m: N.G5, b: null, d: 0.45 },
+      { m: N.C6, b: N.E4, d: 0.8 },
+      { m: N.B5, b: null, d: 0.5 },
+      { m: N.A5, b: N.F4, d: 0.5 },
+      { m: N.A5, b: null, d: 0.5 },
+      { m: N.G5, b: N.C4, d: 1.1 },
+
+      { m: N.D5, b: N.G4, d: 0.45 },
+      { m: N.E5, b: null, d: 0.45 },
+      { m: N.F5, b: N.D4, d: 0.7 },
+      { m: N.D5, b: null, d: 0.45 },
+      { m: N.D5, b: N.G4, d: 0.45 },
+      { m: N.E5, b: null, d: 0.45 },
+      { m: N.F5, b: N.D4, d: 0.9 },
+
+      { m: N.D5, b: N.G4, d: 0.45 },
+      { m: N.F5, b: null, d: 0.45 },
+      { m: N.B5, b: N.G4, d: 0.7 },
+      { m: N.A5, b: null, d: 0.45 },
+      { m: N.G5, b: N.E4, d: 0.5 },
+      { m: N.B5, b: null, d: 0.5 },
+      { m: N.C6, b: N.C4, d: 1.5 }
+    ];
+
+    // Timbre cristalino tipo caja de música infantil (Music Box / Celesta)
+    function playMusicBoxBell(freq, vol, dur) {
+      if (!audioCtx || !freq) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Onda senoidal pura para simular campanita de cristal
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        // Ataque percusivo inmediato y decaimiento suave y cristalino
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(vol, audioCtx.currentTime + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur * 1.8);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + dur * 1.85);
+      } catch (err) {}
+    }
+
+    let noteIdx = 0;
+    function playLoop() {
+      if (!isPlaying) return;
+      const n = lullaby[noteIdx];
+
+      // Campanita principal
+      playMusicBoxBell(n.m, 0.16, n.d);
+      // Campanita armónica suave
+      if (n.b) playMusicBoxBell(n.b * 2, 0.07, n.d * 1.2);
+
+      noteIdx = (noteIdx + 1) % lullaby.length;
+      melodyTimer = setTimeout(playLoop, n.d * 820);
+    }
+
+    function initAudioAndPlay() {
+      try {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        if (!isPlaying) {
+          isPlaying = true;
+          noteIdx = 0;
+          playLoop();
+          updateMusicUI();
+        }
+      } catch (e) {}
+    }
+
+    function toggleMusic() {
+      if (isPlaying) {
+        clearTimeout(melodyTimer);
+        isPlaying = false;
+      } else {
+        initAudioAndPlay();
+      }
+      updateMusicUI();
+    }
+
+    function updateMusicUI() {
+      const waves = document.getElementById('musicWaves');
+      if (waves) {
+        if (isPlaying) {
+          waves.classList.remove('paused');
+        } else {
+          waves.classList.add('paused');
+        }
+      }
+    }
+
+    /* =========================================================
+       4. MENSAJE RSVP WHATSAPP ADAPTADO AL BAUTIZO
+       ========================================================= */
+    function sendRSVP(e) {
+      e.preventDefault();
+      const name = document.getElementById('guestName').value.trim();
+      const passes = document.getElementById('guestPasses').value;
+      const note = document.getElementById('guestNote').value.trim();
+
+      let msg = `¡Hola! Con mucho gusto confirmamos nuestra asistencia al Bautizo de Annette el 21 de Noviembre.%0A%0A`;
+      msg += `*Familia / Asistente:* ${encodeURIComponent(name)}%0A`;
+      msg += `*Lugares confirmados:* ${passes}%0A`;
+      if (note) {
+        msg += `*Mensaje:* ${encodeURIComponent(note)}`;
+      }
+
+      window.open(`https://api.whatsapp.com/send?phone=525539330235&text=${msg}`, '_blank');
+    }
+  </script>
+</body>
+</html>
